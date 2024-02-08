@@ -7,42 +7,39 @@
 
 import UIKit
 
-class ListingViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
+// same here as well
+final class ListingViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate, ListingViewModelDelegate, PresentMovieDetailsDelegate {
     
     @IBOutlet private weak var searchField: UITextField!
     @IBOutlet private weak var searchButton: UIButton!
     @IBOutlet private weak var movieListingTableView: UITableView!
     @IBOutlet private weak var errorLabel: UILabel!
     
-    var movies: [Movie] = []
-    var firstSearch: String = ""
+    var searchTask: DispatchWorkItem?
+    var searchText: String = "" // why do we need this ?
     var listingViewModel = ListingViewModel(networkManager: NetworkManager())
-   // let resultsPerPage = 10
-    let defaults = UserDefaults.standard
-    let imageCache = ImageCache.shared
-    var details: Movie?
+    private let defaults = UserDefaults.standard
     
     //MARK - View Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        initialSetups()
+        initialSetups() // Setups??
+        listingViewModel.delegate = self
+        listingViewModel.detailsDelegate = self
     }
     
     private func initialSetups() {
-        searchField.delegate = self
+        searchField.delegate = self // delegate functionality was on top here also consolidate in one place
         setupTableView()
         setupErrorLabel()
-        searchField.text = firstSearch
+        searchField.text = searchText
         movieListingTableView.separatorStyle = .none
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         movieListingTableView.reloadData()
-//        if let selectedIndexPath = movieListingTableView.indexPathForSelectedRow {
-//            movieListingTableView.deselectRow(at: selectedIndexPath, animated: true)
-//        }
     }
     
     // MARK - UI SETUP
@@ -56,12 +53,11 @@ class ListingViewController: UIViewController, UITableViewDelegate, UITableViewD
         movieListingTableView.delegate = self
         
         let nib = UINib(nibName: "MovieListingCell", bundle: nil)
-        movieListingTableView.register(nib, forCellReuseIdentifier: "movieListingCell")
-        movieListingTableView.separatorInset = UIEdgeInsets(top:16, left: 16, bottom: 16, right: 16)
+        movieListingTableView.register(nib, forCellReuseIdentifier: "movieListingCell") // constants at on place
+        movieListingTableView.separatorInset = UIEdgeInsets(top:16, left: 16, bottom: 16, right: 16) // what is this ?
     }
     
     //MARK - ERROR HANDLING
-    
     private func showErrorMessage(_ message: String) {
         DispatchQueue.main.async {
             self.errorLabel.text = message
@@ -80,120 +76,96 @@ class ListingViewController: UIViewController, UITableViewDelegate, UITableViewD
     //MARK - Search Button Action
     
     @IBAction func searchButtonTapped(_ sender: Any) {
-        guard let searchTerm = searchField.text, !searchTerm.isEmpty else { return }
-        firstSearch = searchTerm
+        guard let searchTerm = searchField.text,
+              !searchTerm.isEmpty else
+        {
+            return
+        }
+        searchText = searchTerm
         searchMovies(searchTerm: searchTerm)
     }
     
     // MARK - Movie Search
     private func searchMovies(searchTerm: String) {
-        listingViewModel.searchMovies(searchTerm: searchTerm) { [weak self] result in
-            switch result {
-            case .success(let movies):
-                self?.movies = movies.search
-                self?.hideErrorMessage()
-                DispatchQueue.main.async {
-                    self?.movieListingTableView.reloadData()
-                }
-            case .failure(let errors):
-                self?.showErrorMessage(errors.joined(separator: "\n"))
-            }
+        listingViewModel.searchMovies(searchTerm: searchTerm)
+    }
+    
+    func searchSucceeded() {
+        hideErrorMessage()
+        DispatchQueue.main.async {
+            self.movieListingTableView.reloadData()
         }
     }
+    
+    func searchFailed(error message: String) {
+        showErrorMessage(message)
+    }
+    
     
     //MARK - TABLE VIEW SETUP
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return listingViewModel.getNumberOfRows()
+        return listingViewModel.getNumberOfMovies()
     }
     
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "movieListingCell", for: indexPath) as! MovieListingCell
-       
+        
         cell.selectionStyle = .none
-//        cell.layer.cornerRadius = 14
-//        cell.layer.borderWidth = 2
-//        cell.layer.borderColor = UIColor.gray.withAlphaComponent(0.2).cgColor
         cell.setUpView()
-        
-//        cell.setupButton()
-//        cell.resetView()
-        details = listingViewModel.movieDetails(indexPath)
-        movies.append(details!)
-        cell.setupFields(details!)
-       // cell.setupFields(movie: movies[indexPath.row])
-        
-        let imageUrlString = movies[indexPath.row].poster
-        if let imageUrl = URL(string: imageUrlString) {
-            imageCache.loadImage(from: imageUrl) { [weak cell] image in
-                guard let image = image else { return }
-                DispatchQueue.main.async {
-                    cell?.setupMovieImage(image)
-                }
-            }
-        }
-        let movieId = movies[indexPath.row].imdbID
-        cell.updateButton(movies[indexPath.row].isInWatchlist )
-        
-        cell.storeindefaults = { [weak self] in
+        let movie = listingViewModel.movieDetails(indexPath)
+        cell.setupFields(movie)
+        // why two methods one of set up view and then fields ? if one is done another can be induced by it
+        let movieId = movie.imdbID
+        cell.saveWatchListInfo = { [weak self] in
             guard let self else { return }
-            let isWatchlist = self.movies[indexPath.row].isInWatchlist 
+            let isWatchlist = movie.isInWatchlist
             self.defaults.set(!isWatchlist, forKey: movieId)
             cell.updateButton(!isWatchlist)
         }
         return cell
+        /// reusablity code is missing how to reset the view
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let searchid = movies[indexPath.row].imdbID
-        presentDetailsViewController(id: searchid, isadded: movies[indexPath.row].isInWatchlist )
+        listingViewModel.didSelect(at: indexPath)
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        let lastElement = movies.count - 1
+        let lastElement = listingViewModel.getNumberOfMovies() - 3
         if indexPath.row == lastElement {
             loadMoreResults()
         }
+        // what is prefetch data source check
     }
     
     //MARK - Load More Results
     
     private func loadMoreResults() {
-        listingViewModel.loadMoreResults(search: firstSearch) { [weak self] result in
-            switch result {
-            case .success(let newMovies):
-                self?.movies.append(contentsOf: newMovies.search)
-                DispatchQueue.main.async {
-                    self?.movieListingTableView.reloadData()
-                }
-                
-            case .failure(let errors):
-                return
-                // print("Error loading more results")
-            }
-        }
+        listingViewModel.loadMoreResults(search: searchText)
+        // unrequired fucntion could be directly called as its one liner
     }
     
     //MARK - Present Details View Controller
     
-    private func presentDetailsViewController(id: String, isadded: Bool) {
+    func presentDetailsViewController(_ model: MovieDetailsViewModel) {
+        model.resetData()
         if let detailsViewController = self.storyboard?.instantiateViewController(withIdentifier: "MovieDetailsController") as? MovieDetailsController {
-            detailsViewController.searchid = id
-            detailsViewController.addedToWistlist = isadded
+            detailsViewController.movieDetailsViewModel = model
+            //make it viewmodel
             detailsViewController.modalPresentationStyle = .fullScreen
             self.present(detailsViewController, animated: true)
         }
     }
-
-    //MARK - Text Field Delegate
     
-    var searchTask: DispatchWorkItem?
+    
+    //MARK - Text Field Delegate
+
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         guard let currentText = textField.text else { return true }
         let newText = (currentText as NSString).replacingCharacters(in: range, with: string)
-        firstSearch = newText
-        
+        searchText = newText
         searchTask?.cancel()
         
         if newText.count >= 3 {
@@ -203,7 +175,7 @@ class ListingViewController: UIViewController, UITableViewDelegate, UITableViewD
             searchTask = task
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: task)
         } else {
-            searchMovies(searchTerm: newText)
+            searchMovies(searchTerm: newText) // why call after 3 dirctly without waiting can wait here as well
         }
         return true
     }

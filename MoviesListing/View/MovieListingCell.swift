@@ -6,16 +6,7 @@
 //
 
 import UIKit
-
-struct MovieListingCellData {
-    let movieImage: UIImage
-    let movieTitle: String
-    let movieYear: String
-    let typeImage: UIImage
-    let typeLabel: String
-}
-
-class MovieListingCell: UITableViewCell {
+final class MovieListingCell: UITableViewCell {
         
     @IBOutlet weak var movieImage: UIImageView!
     @IBOutlet weak var movieTitle: UILabel!
@@ -23,12 +14,11 @@ class MovieListingCell: UITableViewCell {
     @IBOutlet weak var typeImage: UIImageView!
     @IBOutlet weak var typeLabel: UILabel!
     @IBOutlet weak var watchlistButton: UIButton!
-    
-  
     @IBOutlet weak var mainview: UIView!
     
     
-    var storeindefaults: (() -> Void)?
+    var saveWatchListInfo: (() -> Void)?
+    private let imageCache = ImageCache.shared // why is this here
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -39,7 +29,7 @@ class MovieListingCell: UITableViewCell {
     }
     
     func setUpCell() {
-        
+        // empty function
     }
     
     func setUpView() {
@@ -63,13 +53,15 @@ class MovieListingCell: UITableViewCell {
     private func resetView() {
         watchlistButton.tintColor = tintColor
         watchlistButton.setTitle("Add to watchlist", for: .normal)
+        movieImage.image = nil
     }
     
     private func addtowatchlist() {
-        storeindefaults?()
+        saveWatchListInfo?()
     }
     
     func updateButton(_ added: Bool) {
+        // can get button title as well
         if added {
             watchlistButton.tintColor = .systemGreen
             watchlistButton.setTitle("Added to watchlist", for: .normal)
@@ -85,11 +77,23 @@ class MovieListingCell: UITableViewCell {
         movieTitle.text = movie.title
         movieYear.text = movie.year
         typeLabel.text = movie.type
+        /// need not hard code moview or series can get from model
         if movie.type == "movie" {
             typeImage.image = UIImage(named: "movie")
         } else {
             typeImage.image = UIImage(named: "series")
         }
+        
+        let imageUrlString = movie.poster
+        if let imageUrl = URL(string: imageUrlString) {
+            imageCache.loadImage(from: imageUrl) { [weak self] image in
+                guard let image = image else { return }
+                DispatchQueue.main.async {
+                    self?.setupMovieImage(image)
+                }
+            }
+        }
+        updateButton(movie.isInWatchlist)
     }
     
 }

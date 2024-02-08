@@ -131,7 +131,7 @@
                                         <textInputTraits key="textInputTraits"/>
                                     </textField>
                                 </subviews>
-                                <color key="backgroundColor" red="0.93884283304214478" green="0.98123890161514282" blue="0.94141417741775513" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="backgroundColor" red="0.85435026884078979" green="0.95320075750350952" blue="0.95985466241836548" alpha="0.25783018079999998" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstItem="Bht-Zm-NdT" firstAttribute="centerY" secondItem="ZFS-b3-a8M" secondAttribute="centerY" id="6eS-ft-wRB"/>
                                     <constraint firstItem="vQN-42-HId" firstAttribute="width" secondItem="ZFS-b3-a8M" secondAttribute="width" multiplier="0.6" id="9rS-fu-xjo"/>

@@ -7,26 +7,33 @@
 
 import UIKit
 
-class MovieDetailsController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+final class MovieDetailsController: UIViewController, UITableViewDelegate, UITableViewDataSource, MovieDetailsModelDelegate  {
+    
+    // should have a single xib rather should be multiple fro every row as of now
     
     @IBOutlet private weak var tableView: UITableView!
     @IBOutlet private weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet private weak var errorLabel: UILabel!
     
-    var searchid: String = ""
-    var movieDetails: MovieDetails?
-    let defaults = UserDefaults.standard
-    var addedToWistlist: Bool = false
+    //var searchid: String = ""
+    private var movieDetails: MovieDetails?
+    private let defaults = UserDefaults.standard
+    // var addedToWistlist: Bool = false
     var movieDetailsViewModel = MovieDetailsViewModel(networkManager: NetworkManager())
     
-    
+    deinit { // why do we manually need to do this ?
+        movieDetails = nil
+        print("denit called")
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
+        movieDetailsViewModel.delegate = self
         setupTableView()
         setupActivityIndicator()
         fetchMovieDetails()
         tableView.allowsSelection = false
         setupErrorLabel()
+        
     }
     
     //MARK - UI Setup
@@ -87,32 +94,21 @@ class MovieDetailsController: UIViewController, UITableViewDelegate, UITableView
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "movieDetailsCell", for: indexPath) as! MovieDetailsCell
         configureCell(cell)
-        cell.updateButton(addedToWistlist)
+        // wrong place for api call very very very wrong
         return cell
     }
     
     private func configureCell(_ cell: MovieDetailsCell) {
-        guard let details = movieDetails else { return }
         cell.backgroundColor = .black
-        guard let movieDetails = movieDetails else { return}
+        guard let movieDetails = movieDetailsViewModel.getMovieDetails() else { return }
         cell.setupFields(movieDetails: movieDetails)
-        cell.setupButton()
-        
-        if let imageUrl = URL(string: details.poster) {
-            DispatchQueue.global().async {
-                if let imageData = try? Data(contentsOf: imageUrl),
-                   let image = UIImage(data: imageData) {
-                    DispatchQueue.main.async {
-                        cell.setupMovieImage(image)
-                    }
-                }
-            }
-        }
-        cell.storetodefaults = { [weak self] in
+        cell.storetodefaults = { [weak self] in // camelCase
             guard let self else { return }
-            self.defaults.set(!self.addedToWistlist, forKey: self.searchid)
-            cell.updateButton(!self.addedToWistlist)
-            self.addedToWistlist = !self.addedToWistlist
+            // force unwrap
+            self.defaults.set(!movieDetails.isInWatchlist!, forKey: movieDetails.imdbID)
+            // movieDetailsViewModel.updateWatchlistState()
+            cell.updateButton(!movieDetails.isInWatchlist!)
+            self.movieDetailsViewModel.addedToWistlist = !self.movieDetailsViewModel.addedToWistlist
         }
     }
     
@@ -137,34 +133,34 @@ class MovieDetailsController: UIViewController, UITableViewDelegate, UITableView
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        // can return directly
         return CGFloat(20)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        print("disappear")
     }
     
     //MARK- Fetch Movie Details
     
     private func fetchMovieDetails() {
         showActivityIndicator()
-        
-        movieDetailsViewModel.fetchMovieDetails(movieID: searchid) { [weak self] result in
-            guard let self = self else { return }
-            
-            switch result {
-            case .success(let details):
-                self.hideErrorMessage()
-                self.movieDetails = details
-                DispatchQueue.main.async {
-                    self.tableView.reloadData()
-                    self.hideActivityIndicator()
-                }
-            case .failure(_):
-                self.showErrorMessage("Sorry, could not fetch movie details")
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                    self.dismiss(animated: true, completion: nil)
-                }
-                // print("Error fetching movie details: \(error)")
-                self.hideActivityIndicator()
-            }
+        movieDetailsViewModel.fetchMovieDetails()
+    }
+    
+    func fetchingDetailsSucceded() {
+        hideErrorMessage()
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+            self.hideActivityIndicator()
         }
     }
     
+    func fetchingDetailsFailed() {
+        showErrorMessage("Sorry, could not fetch movie details")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            self.dismiss(animated: true, completion: nil)
+        }
+        hideActivityIndicator()
+    }
 }

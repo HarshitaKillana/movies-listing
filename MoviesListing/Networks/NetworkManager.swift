@@ -7,24 +7,32 @@
 
 import Foundation
 
+//TODO: Cell reusablity scenarios when new data is loaded place holder should be there or reset code should be there since rgitering on the same table view from ememory it deques the same cell back again
+
 enum ValidationResultforDetails {
     case success(MovieDetails)
-    case failure([String])
+    case failure(String)
 }
 
+enum ValidationResult {
+    case success(MovieSearchResponse)
+    case failure(String)
+}
+
+
 protocol SeachMovieFetchable {
-    func searchMovies(parameters: SearchParameters, completion: @escaping (ValidationResult) -> Void)
+    func searchMovies(parameters: SearchParameters, completion: @escaping (Result<MovieSearchResponse, Error>) -> ())
 }
 
 protocol MovieDetailsFetchable {
     func fetchMovieDetails(movieID: String, completion: @escaping (ValidationResultforDetails) -> Void)
 }
 
-class NetworkManager: SeachMovieFetchable {
+final class NetworkManager: SeachMovieFetchable {
     
-    func searchMovies(parameters: SearchParameters, completion: @escaping (ValidationResult) -> Void) {
+    func searchMovies(parameters: SearchParameters, completion: @escaping (Result<MovieSearchResponse, Error>) -> ()) {
         guard let baseURL = URL(string: "https://www.omdbapi.com/") else {
-            completion(.failure(["Invalid URL"]))
+           // completion(.failure(error))
             return
         }
         
@@ -39,22 +47,29 @@ class NetworkManager: SeachMovieFetchable {
         components?.queryItems = queryItems
         
         guard let finalURL = components?.url else {
-            completion(.failure(["Invalid URL"]))
+           // completion(.failure("Invalid URL"))
             return
         }
         
         let task = URLSession.shared.dataTask(with: finalURL) { data, response, error in
             
-            guard let data = data else {
-                completion(.failure(["No data"]))
+            guard let data else {
+                if let error {
+                    completion(.failure(error))
+                }
                 return
             }
             
             do {
                 let decodedData = try JSONDecoder().decode(MovieSearchResponse.self, from: data)
-                completion(.success(decodedData))
+                if let responseResult = decodedData.response, responseResult.lowercased() == "true".lowercased() {
+                    completion(.success(decodedData))
+                } else {
+                    let error2  = NSError(domain: "blibli.com", code: 404, userInfo: ["Error": "Movie not Found"])
+                    completion(.failure(error2))
+                }
             } catch {
-                completion(.failure(["No movies found with the name \" \(parameters.query)\""]))
+                completion(.failure(error))
             }
         }
         task.resume()
@@ -66,7 +81,7 @@ extension NetworkManager : MovieDetailsFetchable {
     
     func fetchMovieDetails(movieID: String, completion: @escaping (ValidationResultforDetails) -> Void) {
         guard let baseURL = URL(string: "https://www.omdbapi.com/") else {
-            completion(.failure(["Invalid URL"]))
+            completion(.failure("Invalid URL"))
             return
         }
         
@@ -79,23 +94,29 @@ extension NetworkManager : MovieDetailsFetchable {
         components?.queryItems = queryItems
         
         guard let finalURL = components?.url else {
-            completion(.failure(["Invalid URL"]))
+            completion(.failure("Invalid URL"))
             return
         }
         
         let task = URLSession.shared.dataTask(with: finalURL) { data, response, error in
             guard let data = data else {
-                completion(.failure(["No data"]))
+                completion(.failure("No data"))
                 return
             }
+            guard let response else { return }
+            print(type(of: response))
             
             do {
                 let decodedData = try JSONDecoder().decode(MovieDetails.self, from: data)
                 completion(.success(decodedData))
             } catch let error {
-                completion(.failure(["Error decoding movie details \(error.localizedDescription)"]))
+                completion(.failure("Error decoding movie details \(error.localizedDescription)"))
             }
         }
         task.resume()
     }
 }
+
+
+//Error = "Movie not found!";
+//Response = False;

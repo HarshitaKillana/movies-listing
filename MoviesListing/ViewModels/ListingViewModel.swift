@@ -7,70 +7,64 @@
 
 import Foundation
 
-class ListingViewModel {
+protocol ListingViewModelDelegate: AnyObject {
+    func searchSucceeded()
+    func searchFailed(error message: String)
+}
+
+protocol PresentMovieDetailsDelegate: AnyObject {
+    func presentDetailsViewController(_ model: MovieDetailsViewModel)
+}
+
+final class ListingViewModel {
     private let networkManager: SeachMovieFetchable
+    weak var delegate: ListingViewModelDelegate?
+    weak var detailsDelegate: PresentMovieDetailsDelegate? // delegate shoul dhave meaningful name of what thery are doing
     
     init(networkManager: SeachMovieFetchable) {
         self.networkManager = networkManager
     }
     
-    var movies: [Movie] = []
+    let movieDetailsModel = MovieDetailsViewModel(networkManager: NetworkManager())
+    var movies: [Movie] = [] // private ?
     var currentPage: Int = 1
     var totalResults: Int = 0
-    let resultsPerPage: Int = 10
+    let resultsPerPage: Int = 10 // al of these can be private
     var lastSearchTerm: String = ""
     
     func movieDetails(_ indexPath: IndexPath) -> Movie{
         return movies[indexPath.row]
     }
     
-    func getNumberOfRows() -> Int {
+    func getNumberOfMovies() -> Int {
         return movies.count
     }
     
     
-    func searchMovies(searchTerm: String, completion: @escaping (ValidationResult) -> Void) {
+    func searchMovies(searchTerm: String) {
         guard searchTerm.count >= 3 else {
-            completion(.failure(["Enter a minimum of three letters"]))
+            delegate?.searchFailed(error: "Enter a minimum of three letters")
             return
         }
         lastSearchTerm = searchTerm
+        currentPage = 1
         let parameters = SearchParameters(query: searchTerm, page: currentPage)
         networkManager.searchMovies(parameters: parameters) { [weak self] result in
             switch result {
             case .success(let movies):
-                self?.totalResults = Int(movies.totalResults)!
-                self?.movies.append(contentsOf: movies.search)
-                completion(.success(movies))
-            case .failure(let errors):
-                DispatchQueue.main.async {
-                    completion(.failure(errors))
-                }
+                self?.totalResults = Int(movies.totalResults ?? "0")!
+                self?.movies = movies.search ?? []
+                self?.delegate?.searchSucceeded()
+            case .failure(_):
+                self?.delegate?.searchFailed(error: "no movie found")
             }
         }
     }
     
-    func loadMoreResults(search: String, completion: @escaping (ValidationResult) -> Void) {
-//        print(lastSearchTerm)
-//        print(totalResults)
-//        print(currentPage * resultsPerPage)
+    func loadMoreResults(search: String) {
         lastSearchTerm = search
-        if totalResults == 0 {
-            let parameters = SearchParameters(query: lastSearchTerm, page: currentPage)
-            networkManager.searchMovies(parameters: parameters) { [weak self] result in
-                switch result {
-                case .success(let movies):
-                    completion(.success(movies))
-                    self?.totalResults = Int(movies.totalResults)!
-                case .failure(let errors):
-                    DispatchQueue.main.async {
-                        completion(.failure(errors))
-                    }
-                }
-            }
-        }
         guard totalResults > currentPage * resultsPerPage else {
-            completion(.failure(["No more results"]))
+            //delegate?.searchFailed(error: "No more results")
             return
         }
         
@@ -79,13 +73,19 @@ class ListingViewModel {
         networkManager.searchMovies(parameters: parameters) { [weak self] result in
             switch result {
             case .success(let movies):
-                completion(.success(movies))
-            case .failure(let errors):
-                completion(.failure(errors))
-//                DispatchQueue.main.async {
-//                    completion(.failure(errors))
-//                }
+                self?.movies.append(contentsOf: movies.search ?? [])
+                self?.delegate?.searchSucceeded()
+            case .failure(_):
+                self?.delegate?.searchFailed(error: "no movie found")
+                
             }
         }
+    }
+    
+    func didSelect(at indexPath: IndexPath){
+        let searchid = movies[indexPath.row].imdbID
+        movieDetailsModel.searchid = searchid // camel case
+        movieDetailsModel.addedToWistlist = movies[indexPath.row].isInWatchlist
+        detailsDelegate?.presentDetailsViewController(movieDetailsModel)
     }
 }
