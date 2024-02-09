@@ -90,6 +90,6 @@
         </tableViewCell>
     </objects>
     <resources>
-        <image name="Image 2" width="360" height="504"/>
+        <image name="Image 2" width="200" height="200"/>
     </resources>
 </document>

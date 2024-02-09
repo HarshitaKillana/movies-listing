@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class MovieDetailsController: UIViewController, UITableViewDelegate, UITableViewDataSource, MovieDetailsModelDelegate  {
+final class MovieDetailsController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
     // should have a single xib rather should be multiple fro every row as of now
     
@@ -15,16 +15,10 @@ final class MovieDetailsController: UIViewController, UITableViewDelegate, UITab
     @IBOutlet private weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet private weak var errorLabel: UILabel!
     
-    //var searchid: String = ""
     private var movieDetails: MovieDetails?
     private let defaults = UserDefaults.standard
-    // var addedToWistlist: Bool = false
     var movieDetailsViewModel = MovieDetailsViewModel(networkManager: NetworkManager())
     
-    deinit { // why do we manually need to do this ?
-        movieDetails = nil
-        print("denit called")
-    }
     override func viewDidLoad() {
         super.viewDidLoad()
         movieDetailsViewModel.delegate = self
@@ -32,7 +26,7 @@ final class MovieDetailsController: UIViewController, UITableViewDelegate, UITab
         setupActivityIndicator()
         fetchMovieDetails()
         tableView.allowsSelection = false
-        setupErrorLabel()
+       // setupErrorLabel()
         
     }
     
@@ -94,7 +88,6 @@ final class MovieDetailsController: UIViewController, UITableViewDelegate, UITab
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "movieDetailsCell", for: indexPath) as! MovieDetailsCell
         configureCell(cell)
-        // wrong place for api call very very very wrong
         return cell
     }
     
@@ -102,11 +95,10 @@ final class MovieDetailsController: UIViewController, UITableViewDelegate, UITab
         cell.backgroundColor = .black
         guard let movieDetails = movieDetailsViewModel.getMovieDetails() else { return }
         cell.setupFields(movieDetails: movieDetails)
-        cell.storetodefaults = { [weak self] in // camelCase
+        cell.storeToDefaults = { [weak self] in
             guard let self else { return }
             // force unwrap
-            self.defaults.set(!movieDetails.isInWatchlist!, forKey: movieDetails.imdbID)
-            // movieDetailsViewModel.updateWatchlistState()
+            self.defaults.set(!movieDetails.isInWatchlist!, forKey: movieDetails.imdbID ?? "")
             cell.updateButton(!movieDetails.isInWatchlist!)
             self.movieDetailsViewModel.addedToWistlist = !self.movieDetailsViewModel.addedToWistlist
         }
@@ -133,8 +125,7 @@ final class MovieDetailsController: UIViewController, UITableViewDelegate, UITab
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        // can return directly
-        return CGFloat(20)
+        CGFloat(20)
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -147,7 +138,9 @@ final class MovieDetailsController: UIViewController, UITableViewDelegate, UITab
         showActivityIndicator()
         movieDetailsViewModel.fetchMovieDetails()
     }
-    
+}
+
+extension MovieDetailsController: MovieDetailsModelDelegate {
     func fetchingDetailsSucceded() {
         hideErrorMessage()
         DispatchQueue.main.async {

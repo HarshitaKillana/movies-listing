@@ -7,15 +7,14 @@
 
 import UIKit
 
-// Try to  make differen conformations in different extensions
-final class HomeViewController: UIViewController, UITextFieldDelegate, HomeViewModelDelegate {
+final class HomeViewController: UIViewController, UITextFieldDelegate {
     
     @IBOutlet private weak var movieTextField: UITextField!
     @IBOutlet private weak var searchButton: UIButton!
     @IBOutlet private weak var pixarImage: UIImageView!
     @IBOutlet private weak var errorLabel: UILabel!
     
-    let homeViewModel: HomeViewModel = HomeViewModel(networkManager: NetworkManager()) // default argument
+    let homeViewModel: HomeViewModel = HomeViewModel()
     
     override func viewDidLoad() {
         // requirement in did load
@@ -26,10 +25,11 @@ final class HomeViewController: UIViewController, UITextFieldDelegate, HomeViewM
         movieTextField.delegate = self
         homeViewModel.delegate = self
     }
+    
     override func viewWillAppear(_ animated: Bool) {
         movieTextField.text = ""
     }
-    
+
     //MARK - Setup UI
     private func setupLabel() {
         errorLabel.isHidden = true
@@ -46,31 +46,20 @@ final class HomeViewController: UIViewController, UITextFieldDelegate, HomeViewM
     }
     
     private func showError(message: String) {
-        errorLabel.text = message
-        errorLabel.isHidden = false
+        DispatchQueue.main.async {
+            self.errorLabel.text = message
+            self.errorLabel.isHidden = false
+        }
     }
     
     //MARK - Search Button Action
     
     @IBAction func searchButtonTapped(_ sender: Any) {
-        setupLabel()// evertime why should we execute this code
         guard let searchText = movieTextField.text, !searchText.isEmpty else { return }
-        homeViewModel.searchMovies(searchTerm: searchText)
-    }
-    
-    func searchSucceeded(_ viewModel: HomeViewModel, with model: ListingViewModel, searchText: String) {
-        pushListingViewController(with: model, searchText: searchText)
-    }
-    
-    func searchFailed(error message: String) {
-        DispatchQueue.main.async {
-            // this function could be in main thread itself so that itself handle and not a responsibility of caller
-            self.showError(message: message)
-        }
+        homeViewModel.searchMovies(with: searchText)
     }
     
     func textFieldDidChangeSelection(_ textField: UITextField) {
-        // WHEN TO USE
         errorLabel.isHidden = true
     }
     
@@ -85,3 +74,12 @@ final class HomeViewController: UIViewController, UITextFieldDelegate, HomeViewM
     }
 }
 
+extension HomeViewController: HomeViewModelDelegate {
+    func searchSucceeded(with model: ListingViewModel, searchText: String) {
+        pushListingViewController(with: model, searchText: searchText)
+    }
+    
+    func searchFailed(error message: String) {
+            showError(message: message)
+    }
+}

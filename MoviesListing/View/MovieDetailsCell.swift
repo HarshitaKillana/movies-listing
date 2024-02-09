@@ -16,7 +16,7 @@ final class MovieDetailsCell: UITableViewCell {
     @IBOutlet weak var ratingLabel: UILabel!
     @IBOutlet weak var button: UIButton!
     
-    var storetodefaults: (() -> Void)?
+    var storeToDefaults: (() -> Void)?
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -27,12 +27,12 @@ final class MovieDetailsCell: UITableViewCell {
         
     }
     
-    func setupMovieImage(_ image:UIImage) {
-        movieImage.image = image
+    func setupMovieImage(_ imageView:UIImageView) {
+        movieImage.image = imageView.image
     }
     
     @IBAction func addtoWatchlist(_ sender: Any) {
-        storetodefaults?()
+        storeToDefaults?()
     }
     
     func updateButton(_ added: Bool) {
@@ -50,13 +50,17 @@ final class MovieDetailsCell: UITableViewCell {
         button.layer.cornerRadius = button.frame.size.width / 2
     }
     
+    func resetCell() {
+        
+    }
+    
     func setupFields(movieDetails: MovieDetails) {
         setupButton()
         titleLabel.text = movieDetails.title
-        plotLabel.text = "Plot:\n\(movieDetails.plot)"
-        languageLabel.text = "Language: \(movieDetails.language)"
+        plotLabel.text = "Plot:\n\(movieDetails.plot ?? "")"
+        languageLabel.text = "Language: \(movieDetails.language ?? "")"
         updateButton(movieDetails.isInWatchlist!)
-        if let rating = Double(movieDetails.imdbRating), rating >= 0 && rating <= 10 {
+        if let rating = Double(movieDetails.imdbRating ?? ""), rating >= 0 && rating <= 10 {
             let scaledRating = round((rating / 2.0) * 10.0) / 10.0
             let starRating = String(repeating: "⭐", count: Int(scaledRating))
             ratingLabel.text = "Rating: \(starRating)"
@@ -64,12 +68,18 @@ final class MovieDetailsCell: UITableViewCell {
             ratingLabel.text = "Rating: N/A"
         }
         
-        if let imageUrl = URL(string: movieDetails.poster) {
+        if let imageUrl = URL(string: movieDetails.poster ?? "") {
             DispatchQueue.global().async {
                 if let imageData = try? Data(contentsOf: imageUrl),
                    let image = UIImage(data: imageData) {
                     DispatchQueue.main.async {
-                        self.setupMovieImage(image)
+                        let imageView = UIImageView(image: image)
+                        imageView.alpha = 0.0
+                        
+                        self.setupMovieImage(imageView)
+                        UIView.animate(withDuration: 1) {
+                            imageView.alpha = 1.0
+                        }
                     }
                 }
             }

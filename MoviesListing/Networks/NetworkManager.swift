@@ -7,7 +7,7 @@
 
 import Foundation
 
-//TODO: Cell reusablity scenarios when new data is loaded place holder should be there or reset code should be there since rgitering on the same table view from ememory it deques the same cell back again
+//TODO: Cell reusablity scenarios when new data is loaded place holder should be there or reset code should be there since rgitering on the same table view from memory it deques the same cell back again
 
 enum ValidationResultforDetails {
     case success(MovieDetails)
@@ -18,7 +18,6 @@ enum ValidationResult {
     case success(MovieSearchResponse)
     case failure(String)
 }
-
 
 protocol SeachMovieFetchable {
     func searchMovies(parameters: SearchParameters, completion: @escaping (Result<MovieSearchResponse, Error>) -> ())
@@ -65,8 +64,8 @@ final class NetworkManager: SeachMovieFetchable {
                 if let responseResult = decodedData.response, responseResult.lowercased() == "true".lowercased() {
                     completion(.success(decodedData))
                 } else {
-                    let error2  = NSError(domain: "blibli.com", code: 404, userInfo: ["Error": "Movie not Found"])
-                    completion(.failure(error2))
+                    let error  = NSError(domain: "blibli.com", code: 404, userInfo: ["Error": "Movie not Found"])
+                    completion(.failure(error))
                 }
             } catch {
                 completion(.failure(error))
@@ -117,6 +116,3 @@ extension NetworkManager : MovieDetailsFetchable {
     }
 }
 
-
-//Error = "Movie not found!";
-//Response = False;

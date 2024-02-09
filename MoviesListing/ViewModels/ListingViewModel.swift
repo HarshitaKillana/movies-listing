@@ -26,11 +26,11 @@ final class ListingViewModel {
     }
     
     let movieDetailsModel = MovieDetailsViewModel(networkManager: NetworkManager())
-    var movies: [Movie] = [] // private ?
-    var currentPage: Int = 1
+    var movies: [Movie] = []
+    private var currentPage: Int = 1
     var totalResults: Int = 0
-    let resultsPerPage: Int = 10 // al of these can be private
-    var lastSearchTerm: String = ""
+    private let resultsPerPage: Int = 10
+    private var lastSearchTerm: String = ""
     
     func movieDetails(_ indexPath: IndexPath) -> Movie{
         return movies[indexPath.row]
@@ -64,7 +64,6 @@ final class ListingViewModel {
     func loadMoreResults(search: String) {
         lastSearchTerm = search
         guard totalResults > currentPage * resultsPerPage else {
-            //delegate?.searchFailed(error: "No more results")
             return
         }
         
@@ -84,8 +83,9 @@ final class ListingViewModel {
     
     func didSelect(at indexPath: IndexPath){
         let searchid = movies[indexPath.row].imdbID
-        movieDetailsModel.searchid = searchid // camel case
+        movieDetailsModel.searchId = searchid ?? "" 
         movieDetailsModel.addedToWistlist = movies[indexPath.row].isInWatchlist
         detailsDelegate?.presentDetailsViewController(movieDetailsModel)
     }
+    
 }

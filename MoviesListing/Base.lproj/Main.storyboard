@@ -245,7 +245,7 @@
         </scene>
     </scenes>
     <resources>
-        <image name="Image" width="736" height="460"/>
+        <image name="Image" width="245.33332824707031" height="153.33332824707031"/>
         <image name="search" width="512" height="512"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

@@ -16,7 +16,6 @@ final class MovieListingCell: UITableViewCell {
     @IBOutlet weak var watchlistButton: UIButton!
     @IBOutlet weak var mainview: UIView!
     
-    
     var saveWatchListInfo: (() -> Void)?
     private let imageCache = ImageCache.shared // why is this here
     
@@ -28,11 +27,7 @@ final class MovieListingCell: UITableViewCell {
         super.setSelected(selected, animated: animated)
     }
     
-    func setUpCell() {
-        // empty function
-    }
-    
-    func setUpView() {
+    private func setUpView() {
         mainview.layer.borderColor = UIColor.gray.withAlphaComponent(0.1).cgColor
         mainview.layer.borderWidth = 3
         mainview.layer.cornerRadius = 30
@@ -72,6 +67,7 @@ final class MovieListingCell: UITableViewCell {
     }
     
     func setupFields( _ movie: Movie){
+        setUpView()
         setupButton()
         resetView()
         movieTitle.text = movie.title
@@ -84,7 +80,7 @@ final class MovieListingCell: UITableViewCell {
             typeImage.image = UIImage(named: "series")
         }
         
-        let imageUrlString = movie.poster
+        let imageUrlString = movie.poster ?? ""
         if let imageUrl = URL(string: imageUrlString) {
             imageCache.loadImage(from: imageUrl) { [weak self] image in
                 guard let image = image else { return }

@@ -22,13 +22,14 @@ struct MovieSearchResponse: Codable {
 }
 
 struct Movie: Codable {
-    let title: String
-    let year: String
-    let imdbID: String
-    let type: String
-    let poster: String
+    let title: String?
+    let year: String?
+    let imdbID: String?
+    let type: String?
+    let poster: String?
     var isInWatchlist: Bool {
-        UserDefaults.standard.bool(forKey: imdbID)
+        let id = imdbID ?? ""
+        return UserDefaults.standard.bool(forKey: id)
     }
 
     enum CodingKeys: String, CodingKey {
@@ -43,17 +44,16 @@ struct Movie: Codable {
 
 class MovieDetails: Codable {
     var isInWatchlist: Bool?
-    let title: String
-    let year: String
-    let plot: String
-    let imdbID: String
-    let poster: String
-    let rated: String
-    let imdbRating: String
-    let language: String
+    let title: String?
+    let year: String?
+    let plot: String?
+    let imdbID: String?
+    let poster: String?
+    let rated: String?
+    let imdbRating: String?
+    let language: String?
 
     enum CodingKeys: String, CodingKey {
-        
         case title = "Title"
         case year = "Year"
         case plot = "Plot"
