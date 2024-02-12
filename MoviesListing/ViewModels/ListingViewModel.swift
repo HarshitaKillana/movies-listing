@@ -84,7 +84,7 @@ final class ListingViewModel {
     func didSelect(at indexPath: IndexPath){
         let searchid = movies[indexPath.row].imdbID
         movieDetailsModel.searchId = searchid ?? "" 
-        movieDetailsModel.addedToWistlist = movies[indexPath.row].isInWatchlist
+        movieDetailsModel.isAddedToWistlist = movies[indexPath.row].isInWatchlist
         detailsDelegate?.presentDetailsViewController(movieDetailsModel)
     }
     

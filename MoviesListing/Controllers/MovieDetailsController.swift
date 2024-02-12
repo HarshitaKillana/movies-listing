@@ -9,7 +9,7 @@ import UIKit
 
 final class MovieDetailsController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
-    // should have a single xib rather should be multiple fro every row as of now
+    // should have a single xib rather should be multiple for every row as of now
     
     @IBOutlet private weak var tableView: UITableView!
     @IBOutlet private weak var activityIndicator: UIActivityIndicatorView!
@@ -86,7 +86,9 @@ final class MovieDetailsController: UIViewController, UITableViewDelegate, UITab
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "movieDetailsCell", for: indexPath) as! MovieDetailsCell
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "movieDetailsCell", for: indexPath) as? MovieDetailsCell else {
+            return UITableViewCell()
+        }
         configureCell(cell)
         return cell
     }
@@ -97,10 +99,9 @@ final class MovieDetailsController: UIViewController, UITableViewDelegate, UITab
         cell.setupFields(movieDetails: movieDetails)
         cell.storeToDefaults = { [weak self] in
             guard let self else { return }
-            // force unwrap
-            self.defaults.set(!movieDetails.isInWatchlist!, forKey: movieDetails.imdbID ?? "")
+            self.defaults.set(!(movieDetails.isInWatchlist ?? false), forKey: movieDetails.imdbID ?? "")
             cell.updateButton(!movieDetails.isInWatchlist!)
-            self.movieDetailsViewModel.addedToWistlist = !self.movieDetailsViewModel.addedToWistlist
+            self.movieDetailsViewModel.isAddedToWistlist = !self.movieDetailsViewModel.isAddedToWistlist
         }
     }
     

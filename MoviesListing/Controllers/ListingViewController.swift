@@ -98,7 +98,9 @@ final class ListingViewController: UIViewController, UITableViewDelegate, UITabl
     
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "movieListingCell", for: indexPath) as! MovieListingCell
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "movieListingCell", for: indexPath) as? MovieListingCell else {
+            return UITableViewCell()
+        }
         
         cell.selectionStyle = .none
         let movie = listingViewModel.movieDetails(indexPath)

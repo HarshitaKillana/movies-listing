@@ -18,7 +18,7 @@ final class MovieDetailsViewModel {
     weak var delegate: MovieDetailsModelDelegate?
     
     var searchId: String = ""
-    var addedToWistlist: Bool = false
+    var isAddedToWistlist: Bool = false
     
     init(networkManager: MovieDetailsFetchable) {
         self.networkManager = networkManager
@@ -39,7 +39,7 @@ final class MovieDetailsViewModel {
             switch result {
             case .success(let details):
                 self.movieDetails = details
-                self.movieDetails?.isInWatchlist = self.addedToWistlist
+                self.movieDetails?.isInWatchlist = self.isAddedToWistlist
                 self.delegate?.fetchingDetailsSucceded()
             case .failure(_):
                 self.delegate?.fetchingDetailsFailed()
