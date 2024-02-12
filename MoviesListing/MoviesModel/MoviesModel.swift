@@ -28,8 +28,14 @@ struct Movie: Codable {
     let type: String?
     let poster: String?
     var isInWatchlist: Bool {
-        let id = imdbID ?? ""
-        return UserDefaults.standard.bool(forKey: id)
+        guard let id = imdbID else { return false }
+        if let storedData = UserDefaults.standard.data(forKey: id) {
+            if let movie = try? JSONDecoder().decode(Movie.self, from: storedData){
+                return true
+            }
+        }
+        return false
+        //return UserDefaults.standard.bool(forKey: id)
     }
 
     enum CodingKeys: String, CodingKey {

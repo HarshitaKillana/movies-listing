@@ -97,10 +97,11 @@ final class MovieDetailsController: UIViewController, UITableViewDelegate, UITab
         cell.backgroundColor = .black
         guard let movieDetails = movieDetailsViewModel.getMovieDetails() else { return }
         cell.setupFields(movieDetails: movieDetails)
-        cell.storeToDefaults = { [weak self] in
+        cell.saveWatchListInfo = { [weak self] in
             guard let self else { return }
-            self.defaults.set(!(movieDetails.isInWatchlist ?? false), forKey: movieDetails.imdbID ?? "")
-            cell.updateButton(!movieDetails.isInWatchlist!)
+           // self.defaults.set(!(movieDetails.isInWatchlist ?? false), forKey: movieDetails.imdbID ?? "")
+            
+            cell.updateButton(!(movieDetails.isInWatchlist ?? false)  )
             self.movieDetailsViewModel.isAddedToWistlist = !self.movieDetailsViewModel.isAddedToWistlist
         }
     }

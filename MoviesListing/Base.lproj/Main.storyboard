@@ -52,6 +52,26 @@
                                 <color key="textColor" systemColor="systemRedColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4pd-bY-Um9">
+                                <rect key="frame" x="73" y="599.66666666666663" width="244" height="29.333333333333371"/>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="tinted">
+                                    <attributedString key="attributedTitle">
+                                        <fragment content="GO TO WATCHLIST">
+                                            <attributes>
+                                                <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                <font key="NSFont" size="11" name="AvenirNext-DemiBold"/>
+                                                <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                            </attributes>
+                                        </fragment>
+                                    </attributedString>
+                                </buttonConfiguration>
+                                <connections>
+                                    <action selector="searchButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="0Z2-zG-Ts7"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -60,10 +80,14 @@
                             <constraint firstItem="Jjd-7y-4Bn" firstAttribute="top" secondItem="Zph-yu-6eZ" secondAttribute="bottom" constant="40" id="EVp-03-mjI"/>
                             <constraint firstItem="Jjd-7y-4Bn" firstAttribute="width" secondItem="Zph-yu-6eZ" secondAttribute="width" multiplier="0.849593" id="FDv-Fa-9hc"/>
                             <constraint firstItem="xyt-dK-Bke" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="NgA-dc-nPT"/>
+                            <constraint firstItem="4pd-bY-Um9" firstAttribute="leading" secondItem="Jjd-7y-4Bn" secondAttribute="leading" id="O0S-hG-e1h"/>
                             <constraint firstItem="Zph-yu-6eZ" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="Q8d-0m-ILc"/>
                             <constraint firstItem="Eoi-Th-AHq" firstAttribute="height" secondItem="8bC-Xf-vdC" secondAttribute="height" multiplier="0.35" id="QY3-Cf-oHo"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="xyt-dK-Bke" secondAttribute="trailing" constant="10" id="SZ9-FQ-LaE"/>
+                            <constraint firstItem="4pd-bY-Um9" firstAttribute="width" secondItem="Jjd-7y-4Bn" secondAttribute="width" id="Spg-z2-p8I"/>
+                            <constraint firstItem="4pd-bY-Um9" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="VCN-AJ-OKg"/>
                             <constraint firstItem="Zph-yu-6eZ" firstAttribute="top" secondItem="Eoi-Th-AHq" secondAttribute="bottom" constant="30" id="WaM-37-2ni"/>
+                            <constraint firstItem="4pd-bY-Um9" firstAttribute="top" secondItem="xyt-dK-Bke" secondAttribute="bottom" constant="40" id="YAm-dd-iiT"/>
                             <constraint firstItem="xyt-dK-Bke" firstAttribute="top" secondItem="Jjd-7y-4Bn" secondAttribute="bottom" constant="30" id="aKd-Ue-7fj"/>
                             <constraint firstItem="Eoi-Th-AHq" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="cn1-dQ-M6g"/>
                             <constraint firstItem="xyt-dK-Bke" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="10" id="g3f-VT-gEl"/>

@@ -109,10 +109,19 @@ final class ListingViewController: UIViewController, UITableViewDelegate, UITabl
         cell.saveWatchListInfo = { [weak self] in
             guard let self else { return }
             let isWatchlist = movie.isInWatchlist
-            self.defaults.set(!isWatchlist, forKey: movieId ?? "")
+           // self.defaults.set(!isWatchlist, forKey: movieId ?? "")
+            if isWatchlist {
+                self.defaults.removeObject(forKey: movieId ?? "")
+            } else {
+                if let encodedData = try? JSONEncoder().encode(movie) {
+                    self.defaults.set(encodedData, forKey: movieId ?? "")
+                }
+            }
             cell.updateButton(!isWatchlist)
         }
         return cell
+        
+        
         /// reusablity code is missing how to reset the view
     }
     

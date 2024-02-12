@@ -16,7 +16,7 @@ final class MovieDetailsCell: UITableViewCell {
     @IBOutlet weak var ratingLabel: UILabel!
     @IBOutlet weak var button: UIButton!
     
-    var storeToDefaults: (() -> Void)?
+    var saveWatchListInfo: (() -> Void)?
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -32,7 +32,7 @@ final class MovieDetailsCell: UITableViewCell {
     }
     
     @IBAction func addtoWatchlist(_ sender: Any) {
-        storeToDefaults?()
+        saveWatchListInfo?()
     }
     
     func updateButton(_ added: Bool) {
