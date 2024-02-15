@@ -12,7 +12,7 @@ struct MovieSearchResponse: Codable {
     let totalResults: String?
     let response: String?
     let error: String?
-
+    
     enum CodingKeys: String, CodingKey {
         case search = "Search"
         case totalResults
@@ -30,14 +30,15 @@ struct Movie: Codable {
     var isInWatchlist: Bool {
         guard let id = imdbID else { return false }
         if let storedData = UserDefaults.standard.data(forKey: id) {
-            if let movie = try? JSONDecoder().decode(Movie.self, from: storedData){
+            if let storedMovie = try? JSONDecoder().decode(Movie.self, from: storedData) {
                 return true
             }
         }
         return false
-        //return UserDefaults.standard.bool(forKey: id)
     }
-
+    
+    //return UserDefaults.standard.bool(forKey: id)
+    
     enum CodingKeys: String, CodingKey {
         case title = "Title"
         case year = "Year"
@@ -58,7 +59,8 @@ class MovieDetails: Codable {
     let rated: String?
     let imdbRating: String?
     let language: String?
-
+    let type: String?
+    
     enum CodingKeys: String, CodingKey {
         case title = "Title"
         case year = "Year"
@@ -68,6 +70,7 @@ class MovieDetails: Codable {
         case rated = "Rated"
         case imdbRating
         case language = "Language"
+        case type = "Type"
         
     }
 }
@@ -75,7 +78,7 @@ class MovieDetails: Codable {
 struct Rating: Codable {
     let source: String
     let value: String
-
+    
     enum CodingKeys: String, CodingKey {
         case source = "Source"
         case value = "Value"

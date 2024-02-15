@@ -24,6 +24,7 @@ protocol SeachMovieFetchable {
 }
 
 protocol MovieDetailsFetchable {
+    func fetchMovieDetails(movieID: String) async throws -> ValidationResultforDetails?
     func fetchMovieDetails(movieID: String, completion: @escaping (ValidationResultforDetails) -> Void)
 }
 
@@ -98,12 +99,10 @@ extension NetworkManager : MovieDetailsFetchable {
         }
         
         let task = URLSession.shared.dataTask(with: finalURL) { data, response, error in
-            guard let data = data else {
+            guard let data else {
                 completion(.failure("No data"))
                 return
             }
-            guard let response else { return }
-            print(type(of: response))
             
             do {
                 let decodedData = try JSONDecoder().decode(MovieDetails.self, from: data)
@@ -116,3 +115,28 @@ extension NetworkManager : MovieDetailsFetchable {
     }
 }
 
+
+extension NetworkManager {
+    func fetchMovieDetails(movieID: String) async throws -> ValidationResultforDetails? {
+        
+        guard let baseURL = URL(string: "https://www.omdbapi.com/") else {
+            return .failure("base url failed")
+        }
+        var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: true)
+        
+        let queryItems = [
+            URLQueryItem(name: "i", value: movieID),
+            URLQueryItem(name: "apikey", value: "fd12ab17")
+        ]
+        components?.queryItems = queryItems
+        guard let url = components?.url else { return nil}
+        let request = URLRequest(url: url)
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let httpResponse = response as? HTTPURLResponse,
+              httpResponse.statusCode == 200 else {
+            return .failure("api server error")
+        }
+        let MovieDetails = try JSONDecoder().decode(MovieDetails.self, from: data)
+        return .success(MovieDetails)
+    }
+}
