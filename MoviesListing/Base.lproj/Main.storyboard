@@ -6,6 +6,7 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22130"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="collection view cell content view" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -136,68 +137,98 @@
                                 </constraints>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ZFS-b3-a8M" userLabel="SearchView">
-                                <rect key="frame" x="0.0" y="47.000000000000007" width="390" height="67.666666666666686"/>
+                                <rect key="frame" x="0.0" y="47" width="390" height="50.666666666666657"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="251" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Bht-Zm-NdT">
-                                        <rect key="frame" x="298.66666666666669" y="16.333333333333336" width="89.333333333333314" height="35"/>
+                                        <rect key="frame" x="316.33333333333331" y="8" width="61.666666666666686" height="34.333333333333336"/>
                                         <state key="normal" title="Button"/>
-                                        <buttonConfiguration key="configuration" style="tinted" title="SEARCH"/>
+                                        <buttonConfiguration key="configuration" style="tinted" title="Back" cornerStyle="small"/>
                                         <connections>
-                                            <action selector="searchButtonTapped:" destination="sI3-zN-VQ8" eventType="touchUpInside" id="jCu-Zm-lkj"/>
+                                            <action selector="backbuttonTapped:" destination="sI3-zN-VQ8" eventType="touchUpInside" id="CEM-qL-VvU"/>
                                         </connections>
                                     </button>
-                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="search" translatesAutoresizingMaskIntoConstraints="NO" id="nw5-sw-JtJ">
-                                        <rect key="frame" x="10" y="20.333333333333329" width="27" height="27"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" secondItem="nw5-sw-JtJ" secondAttribute="height" id="UIj-Mb-KRt"/>
-                                        </constraints>
-                                    </imageView>
                                     <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Search Movie" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="vQN-42-HId">
-                                        <rect key="frame" x="40.999999999999986" y="16.666666666666664" width="253.66666666666663" height="34"/>
+                                        <rect key="frame" x="36.333333333333329" y="8.3333333333333357" width="253.33333333333337" height="34"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                         <textInputTraits key="textInputTraits"/>
                                     </textField>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="89j-Hw-9I9">
+                                        <rect key="frame" x="9.9999999999999982" y="15.333333333333336" width="20.333333333333329" height="20"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" secondItem="89j-Hw-9I9" secondAttribute="height" id="GPt-vr-W2d"/>
+                                        </constraints>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="plain" image="circle.grid.2x2" catalog="system"/>
+                                        <connections>
+                                            <action selector="gridButtonTapped:" destination="sI3-zN-VQ8" eventType="touchUpInside" id="DIW-59-wgl"/>
+                                        </connections>
+                                    </button>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="UdT-5W-oTG">
+                                        <rect key="frame" x="174" y="14.666666666666664" width="42" height="21"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstItem="Bht-Zm-NdT" firstAttribute="centerY" secondItem="ZFS-b3-a8M" secondAttribute="centerY" id="6eS-ft-wRB"/>
+                                    <constraint firstItem="89j-Hw-9I9" firstAttribute="leading" secondItem="ZFS-b3-a8M" secondAttribute="leading" constant="10" id="8Yj-cg-zr4"/>
                                     <constraint firstItem="vQN-42-HId" firstAttribute="width" secondItem="ZFS-b3-a8M" secondAttribute="width" multiplier="0.65" id="9rS-fu-xjo"/>
+                                    <constraint firstItem="89j-Hw-9I9" firstAttribute="centerY" secondItem="ZFS-b3-a8M" secondAttribute="centerY" id="Aou-Bs-J2e"/>
                                     <constraint firstItem="vQN-42-HId" firstAttribute="centerY" secondItem="ZFS-b3-a8M" secondAttribute="centerY" id="DYz-Wy-agB"/>
-                                    <constraint firstAttribute="trailing" secondItem="Bht-Zm-NdT" secondAttribute="trailing" constant="2" id="DsR-d2-cav"/>
-                                    <constraint firstItem="nw5-sw-JtJ" firstAttribute="leading" secondItem="ZFS-b3-a8M" secondAttribute="leading" constant="10" id="Dwb-Ui-Xex"/>
+                                    <constraint firstAttribute="trailing" secondItem="Bht-Zm-NdT" secondAttribute="trailing" constant="12" id="DsR-d2-cav"/>
                                     <constraint firstItem="Bht-Zm-NdT" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="vQN-42-HId" secondAttribute="trailing" constant="4" id="JGa-kz-M1f"/>
-                                    <constraint firstItem="vQN-42-HId" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="nw5-sw-JtJ" secondAttribute="trailing" constant="4" id="eoE-eA-9RB"/>
-                                    <constraint firstItem="nw5-sw-JtJ" firstAttribute="height" secondItem="ZFS-b3-a8M" secondAttribute="height" multiplier="0.4" id="xzE-rG-MVI"/>
-                                    <constraint firstItem="nw5-sw-JtJ" firstAttribute="centerY" secondItem="ZFS-b3-a8M" secondAttribute="centerY" id="zpk-Ex-ye8"/>
+                                    <constraint firstItem="UdT-5W-oTG" firstAttribute="centerX" secondItem="ZFS-b3-a8M" secondAttribute="centerX" id="W8P-U7-R9e"/>
+                                    <constraint firstItem="89j-Hw-9I9" firstAttribute="height" secondItem="ZFS-b3-a8M" secondAttribute="height" multiplier="0.4" id="bY6-O8-JWp"/>
+                                    <constraint firstItem="UdT-5W-oTG" firstAttribute="centerY" secondItem="ZFS-b3-a8M" secondAttribute="centerY" id="qjf-Th-BMF"/>
+                                    <constraint firstItem="vQN-42-HId" firstAttribute="leading" secondItem="89j-Hw-9I9" secondAttribute="trailing" constant="6" id="t9B-rF-pBK"/>
                                 </constraints>
                             </view>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="RvS-iO-iWc">
-                                <rect key="frame" x="0.0" y="114.66666666666669" width="390" height="646.33333333333326"/>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="smA-HJ-R9k">
+                                <rect key="frame" x="8" y="97.666666666666686" width="374" height="663.33333333333326"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                            </tableView>
+                                <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="oqK-ty-mBJ">
+                                    <size key="itemSize" width="128" height="128"/>
+                                    <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                    <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                    <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                </collectionViewFlowLayout>
+                                <cells>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="OZO-hJ-pe7">
+                                        <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="ANg-5W-6Bb">
+                                            <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </collectionViewCellContentView>
+                                    </collectionViewCell>
+                                </cells>
+                            </collectionView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="ADn-wZ-Z8S"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="RvS-iO-iWc" firstAttribute="leading" secondItem="ADn-wZ-Z8S" secondAttribute="leading" id="8dw-cn-3sk"/>
-                            <constraint firstItem="ZFS-b3-a8M" firstAttribute="height" secondItem="ilT-OI-CVw" secondAttribute="height" multiplier="0.08" id="J75-Ra-EKq"/>
+                            <constraint firstItem="ADn-wZ-Z8S" firstAttribute="bottom" secondItem="smA-HJ-R9k" secondAttribute="bottom" id="30y-9B-1xx"/>
+                            <constraint firstItem="smA-HJ-R9k" firstAttribute="leading" secondItem="ADn-wZ-Z8S" secondAttribute="leading" constant="8" id="8hd-nE-oRV"/>
+                            <constraint firstItem="smA-HJ-R9k" firstAttribute="top" secondItem="ZFS-b3-a8M" secondAttribute="bottom" id="I7U-Tr-Vaz"/>
+                            <constraint firstItem="ZFS-b3-a8M" firstAttribute="height" secondItem="ilT-OI-CVw" secondAttribute="height" multiplier="0.06" id="J75-Ra-EKq"/>
                             <constraint firstItem="5Lr-x1-Jvy" firstAttribute="width" secondItem="ADn-wZ-Z8S" secondAttribute="width" id="JjG-lB-sbN"/>
                             <constraint firstItem="ZFS-b3-a8M" firstAttribute="leading" secondItem="ilT-OI-CVw" secondAttribute="leading" id="RH0-fU-3LP"/>
-                            <constraint firstItem="RvS-iO-iWc" firstAttribute="top" secondItem="ZFS-b3-a8M" secondAttribute="bottom" id="WCw-Bx-vBX"/>
+                            <constraint firstItem="ADn-wZ-Z8S" firstAttribute="trailing" secondItem="smA-HJ-R9k" secondAttribute="trailing" constant="8" id="eh7-Lp-GgN"/>
                             <constraint firstAttribute="trailing" secondItem="ZFS-b3-a8M" secondAttribute="trailing" id="nn9-9A-w2u"/>
                             <constraint firstItem="ADn-wZ-Z8S" firstAttribute="top" secondItem="ZFS-b3-a8M" secondAttribute="top" id="oRP-Vc-0NN"/>
-                            <constraint firstItem="ADn-wZ-Z8S" firstAttribute="trailing" secondItem="RvS-iO-iWc" secondAttribute="trailing" id="pjI-GU-ciE"/>
-                            <constraint firstItem="ADn-wZ-Z8S" firstAttribute="bottom" secondItem="RvS-iO-iWc" secondAttribute="bottom" id="tVH-AM-QVJ"/>
                         </constraints>
                     </view>
                     <tabBarItem key="tabBarItem" title="Watchlist" image="bookmark.circle.fill" catalog="system" id="mbL-FN-CAp"/>
                     <connections>
+                        <outlet property="backButton" destination="Bht-Zm-NdT" id="fjt-WB-E7H"/>
                         <outlet property="errorLabel" destination="Dpb-1G-CEU" id="Tdt-EW-ieT"/>
-                        <outlet property="movieListingTableView" destination="RvS-iO-iWc" id="MR4-dk-KRI"/>
-                        <outlet property="searchButton" destination="Bht-Zm-NdT" id="8JQ-rL-h83"/>
+                        <outlet property="gridButton" destination="89j-Hw-9I9" id="NdC-3w-hd2"/>
+                        <outlet property="movieListingCollectionView" destination="smA-HJ-R9k" id="W0K-Cg-353"/>
                         <outlet property="searchField" destination="vQN-42-HId" id="QM5-Vm-yOP"/>
-                        <outlet property="searchImage" destination="nw5-sw-JtJ" id="sU3-6V-8Fy"/>
                         <outlet property="searchView" destination="ZFS-b3-a8M" id="NuA-fb-HcH"/>
+                        <outlet property="watchlistTitle" destination="UdT-5W-oTG" id="Cyr-fc-cxY"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ep3-s6-gGt" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -261,6 +292,7 @@
                 <tabBarController automaticallyAdjustsScrollViewInsets="NO" id="Ooc-cl-xQb" customClass="RootTabBarController" customModule="MoviesListing" customModuleProvider="target" sceneMemberID="viewController">
                     <toolbarItems/>
                     <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="748-zL-lKj">
+                        <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </tabBar>
@@ -296,8 +328,8 @@
     <resources>
         <image name="Image" width="245.33332824707031" height="153.33332824707031"/>
         <image name="bookmark.circle.fill" catalog="system" width="128" height="123"/>
+        <image name="circle.grid.2x2" catalog="system" width="128" height="111"/>
         <image name="house.fill" catalog="system" width="128" height="104"/>
-        <image name="search" width="512" height="512"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

@@ -8,45 +8,52 @@
 import UIKit
 
 // same here as well
-class ListingViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
+class ListingViewController: UIViewController, UITextFieldDelegate {
     
     @IBOutlet private weak var searchField: UITextField!
-    @IBOutlet private weak var searchButton: UIButton!
-    @IBOutlet private weak var movieListingTableView: UITableView!
     @IBOutlet private weak var errorLabel: UILabel!
+    @IBOutlet private weak var movieListingCollectionView: UICollectionView!
+    @IBOutlet private weak var searchView: UIView!
+    @IBOutlet private weak var gridButton: UIButton!
+    @IBOutlet private weak var backButton: UIButton!
+    @IBOutlet private weak var watchlistTitle: UILabel!
     
-    @IBOutlet weak var searchView: UIView!
-    
-    
-    @IBOutlet weak var searchImage: UIImageView!
     var searchTask: DispatchWorkItem?
     var searchText: String = ""
+    var isFromTabBar: Bool = true
     var presentedDisplayScreen: Bool = false
+    var isGridLayout: Bool = false
+    
     
     var listingViewModel: ListingViewModel = ListingViewModel(networkManager: NetworkManager())
-
+    
     private let defaults = UserDefaults.standard
-        
+    
     //MARK - View Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
         configureViews()
         setupDelegates()
+        self.navigationItem.hidesBackButton = true
     }
     
     override func viewDidDisappear(_ animated: Bool) {
-        if presentedDisplayScreen {
-            listingViewModel.reset()
+        listingViewModel.reset()
+        self.tabBarController?.tabBar.isHidden = false
+    }
+    
+    func showTabBar() {
+        if isFromTabBar, let tabBar = self.tabBarController?.tabBar {
+            tabBar.isHidden = false
+            self.view.bringSubviewToFront(tabBar)
         }
-        presentedDisplayScreen = true
     }
     
     private func configureViews() {
-        setupTableView()
+        setupCollectionView()
         setupErrorLabel()
         searchField.text = searchText
-        movieListingTableView.separatorStyle = .none
     }
     
     private func setupDelegates() {
@@ -55,16 +62,22 @@ class ListingViewController: UIViewController, UITableViewDelegate, UITableViewD
         searchField.delegate = self
         
     }
-  
+    func showingWatchlist() {
+        listingViewModel.loadMoviesFromUserDefaults()
+        hideSearch()
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        if listingViewModel.shouldLoadMovieFromCache, !presentedDisplayScreen{
-            listingViewModel.loadMoviesFromUserDefaults()
+        showTabBar()
+        if isFromTabBar {
             hideSearch()
+            listingViewModel.loadMoviesFromUserDefaults()
         } else {
+            self.tabBarController?.tabBar.isHidden = true
             showSearch()
         }
-        movieListingTableView.reloadData()
+        movieListingCollectionView.reloadData()
         configureViews()
     }
     
@@ -75,23 +88,27 @@ class ListingViewController: UIViewController, UITableViewDelegate, UITableViewD
     
     private func hideSearch() {
         searchField.isHidden = true
-        searchImage.isHidden = true
-        searchButton.isHidden = true
+        gridButton.isHidden = true
+        backButton.isHidden = true
+        watchlistTitle.text = "Your Watchlist"
     }
     
     private func showSearch() {
         searchField.isHidden = false
-        searchImage.isHidden = false
-        searchButton.isHidden = false
+        gridButton.isHidden = false
+        backButton.isHidden = false
+        watchlistTitle.isHidden = true
     }
     
-    private func setupTableView() {
-        movieListingTableView.dataSource = self
-        movieListingTableView.delegate = self
+    private func setupCollectionView() {
+        movieListingCollectionView.dataSource = self
+        movieListingCollectionView.delegate = self
+        let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
+        movieListingCollectionView.collectionViewLayout = layout
         
-        let nib = UINib(nibName: "MovieListingCell", bundle: nil)
-        movieListingTableView.register(nib, forCellReuseIdentifier: "movieListingCell") // constants at on place
-    
+        let nib = UINib(nibName: "CollectionViewCell", bundle: nil)
+        movieListingCollectionView.register(nib, forCellWithReuseIdentifier: "SingleColumnCell")
+        movieListingCollectionView.register(GridCollectionViewCell.self, forCellWithReuseIdentifier:GridCollectionViewCell.identifier)
     }
     
     //MARK - ERROR HANDLING
@@ -99,79 +116,34 @@ class ListingViewController: UIViewController, UITableViewDelegate, UITableViewD
         DispatchQueue.main.async {
             self.errorLabel.text = message
             self.errorLabel.isHidden = false
-            self.movieListingTableView.isHidden = true
+            self.movieListingCollectionView.isHidden = true
         }
     }
     
     private func hideErrorMessage() {
         DispatchQueue.main.async {
             self.errorLabel.isHidden = true
-            self.movieListingTableView.isHidden = false
+            self.movieListingCollectionView.isHidden = false
         }
     }
     
-    //MARK - Search Button Action
-    @IBAction func searchButtonTapped(_ sender: Any) {
-        guard let searchTerm = searchField.text,
-              !searchTerm.isEmpty else
-        {
-            return
-        }
-        searchText = searchTerm
-        searchMovies(searchTerm: searchTerm)
+    @IBAction func gridButtonTapped(_ sender: Any) {
+        isGridLayout = !isGridLayout
+        movieListingCollectionView.reloadData()
+        configureViews()
     }
+    
+    @IBAction func backbuttonTapped(_ sender: Any) {
+        navigationController?.popViewController(animated: true)
+    }
+    
+    
     
     // MARK - Movie Search
     private func searchMovies(searchTerm: String) {
         listingViewModel.searchMovies(searchTerm: searchTerm)
     }
     
-    //MARK - TABLE VIEW SETUP
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let no = listingViewModel.getNumberOfMovies()
-      //  print(no)
-        return no
-    }
-    
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "movieListingCell", for: indexPath) as? MovieListingCell else {
-            return UITableViewCell()
-        }
-        
-        cell.selectionStyle = .none
-        let movie = listingViewModel.movieDetails(indexPath)
-        cell.setupFields(movie)
-        let movieId = movie.imdbID
-        cell.saveWatchListInfo = { [weak self] in
-            guard let self else { return }
-            let isWatchlist = movie.isInWatchlist
-           // self.defaults.set(!isWatchlist, forKey: movieId ?? "")
-            if isWatchlist {
-                self.defaults.removeObject(forKey: movieId ?? "")
-            } else {
-                if let encodedData = try? JSONEncoder().encode(movie) {
-                    UserDefaults.standard.set(encodedData, forKey: movieId ?? "")
-                }
-            }
-            cell.updateButton(!isWatchlist)
-        }
-        return cell
-        
-        /// reusablity code is missing how to reset the view
-    }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        listingViewModel.didSelect(at: indexPath)
-    }
-    
-    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        let lastElement = listingViewModel.getNumberOfMovies() - 2
-        if indexPath.row == lastElement {
-            listingViewModel.loadMoreResults(search: searchText)
-        }
-        // what is prefetch data source check
-    }
     
     //MARK - Text Field Delegate
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
@@ -187,7 +159,7 @@ class ListingViewController: UIViewController, UITableViewDelegate, UITableViewD
             searchTask = task
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: task)
         } else {
-            searchMovies(searchTerm: newText) 
+            searchMovies(searchTerm: newText)
         }
         return true
     }
@@ -197,7 +169,7 @@ extension ListingViewController: ListingViewModelDelegate, PresentMovieDetailsDe
     func searchSucceeded() {
         hideErrorMessage()
         DispatchQueue.main.async {
-            self.movieListingTableView.reloadData()
+            self.movieListingCollectionView.reloadData()
         }
     }
     
@@ -215,4 +187,97 @@ extension ListingViewController: ListingViewModelDelegate, PresentMovieDetailsDe
             listingViewModel.shouldLoadMovieFromCache = false
         }
     }
+}
+
+
+extension ListingViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 1
+    }
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return listingViewModel.getNumberOfMovies()
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        
+        guard let cell = movieListingCollectionView.dequeueReusableCell(withReuseIdentifier: "SingleColumnCell", for: indexPath) as? CollectionViewCell else {
+            return UICollectionViewCell()
+        }
+        
+        guard let gridCell = movieListingCollectionView.dequeueReusableCell(withReuseIdentifier: GridCollectionViewCell.identifier, for: indexPath) as? GridCollectionViewCell else {
+            return UICollectionViewCell()
+        }
+        
+        let movie = listingViewModel.movieDetails(indexPath)
+        let movieId = movie.imdbID
+        if isGridLayout{
+            gridCell.setupFields(movie)
+            gridCell.saveWatchListInfo = { [weak self] in
+                guard let self else { return }
+                let isWatchlist = movie.isInWatchlist
+                if isWatchlist {
+                    self.defaults.removeObject(forKey: movieId ?? "")
+                    self.movieListingCollectionView.reloadData()
+                } else {
+                    if let encodedData = try? JSONEncoder().encode(movie) {
+                        UserDefaults.standard.set(encodedData, forKey: movieId ?? "")
+                    }
+                }
+                gridCell.updateButton(!isWatchlist)
+            }
+            return gridCell
+        } else {
+            cell.setupFields(movie)
+            cell.saveWatchListInfo = { [weak self] in
+                guard let self else { return }
+                let isWatchlist = movie.isInWatchlist
+                if isWatchlist {
+                    self.defaults.removeObject(forKey: movieId ?? "")
+                    self.movieListingCollectionView.reloadData()
+                } else {
+                    if let encodedData = try? JSONEncoder().encode(movie) {
+                        UserDefaults.standard.set(encodedData, forKey: movieId ?? "")
+                    }
+                }
+                cell.updateButton(!isWatchlist)
+            }
+            return cell
+        }
+        
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        let lastElement = listingViewModel.getNumberOfMovies() - 2
+        if indexPath.row == lastElement {
+            listingViewModel.loadMoreResults(search: searchText)
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        listingViewModel.didSelect(at: indexPath)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
+        return 6
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        if isGridLayout{
+            let collectionViewWidth = movieListingCollectionView.bounds.width
+            let dynamicWidth = (collectionViewWidth-20)/2
+            return CGSize(width: dynamicWidth, height: 260)
+        } else {
+            return CGSize(width: UIScreen.main.bounds.width, height: 260)
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        return UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 10
+    }
+    
 }

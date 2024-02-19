@@ -52,7 +52,6 @@ final class NetworkManager: SeachMovieFetchable {
         }
         
         let task = URLSession.shared.dataTask(with: finalURL) { data, response, error in
-            
             guard let data else {
                 if let error {
                     completion(.failure(error))

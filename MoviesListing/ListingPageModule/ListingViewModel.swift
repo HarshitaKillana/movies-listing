@@ -28,18 +28,19 @@ final class ListingViewModel {
 
     let movieDetailsModel = MovieDetailsViewModel(networkManager: NetworkManager())
     var movies: [Movie] = []
+    var watchlistMovies: [Movie] = []
     private var currentPage: Int = 1
     var totalResults: Int = 0
     private let resultsPerPage: Int = 10
     private var lastSearchTerm: String = ""
     
     func reset() {
-        movies = []
         shouldLoadMovieFromCache = true
     }
     
     func movieDetails(_ indexPath: IndexPath) -> Movie{
-        return movies[indexPath.row]
+            return movies[indexPath.row]
+            
     }
     
     func getNumberOfMovies() -> Int {

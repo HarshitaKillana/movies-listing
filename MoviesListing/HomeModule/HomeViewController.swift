@@ -23,14 +23,22 @@ final class HomeViewController: UIViewController, UITextFieldDelegate {
         // requirement in did load
         super.viewDidLoad()
         setupSearchButton()
-        setUpLogo()
+       // setUpLogo()
         setupLabel()
         movieTextField.delegate = self
         homeViewModel.delegate = self
         watchlistButton.isHidden = true
     }
     
+    func showTabBar() {
+        if let tabBar = self.tabBarController?.tabBar {
+            tabBar.isHidden = false
+            self.view.bringSubviewToFront(tabBar)
+        }
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
+        showTabBar()
         movieTextField.text = ""
     }
 
@@ -43,11 +51,11 @@ final class HomeViewController: UIViewController, UITextFieldDelegate {
         searchButton.titleLabel?.textAlignment = .center
     }
     
-    private func setUpLogo() {
-        pixarImage.layer.borderWidth = 1.5
-        pixarImage.layer.cornerRadius = 16
-        pixarImage.layer.borderColor = UIColor.gray.withAlphaComponent(0.2).cgColor
-    }
+//    private func setUpLogo() {
+//        pixarImage.layer.borderWidth = 1.5
+//        pixarImage.layer.cornerRadius = 16
+//        pixarImage.layer.borderColor = UIColor.gray.withAlphaComponent(0.2).cgColor
+//    }
     
     private func showError(message: String) {
         DispatchQueue.main.async {
@@ -87,6 +95,7 @@ final class HomeViewController: UIViewController, UITextFieldDelegate {
         DispatchQueue.main.async {
             if let listingViewController = self.storyboard?.instantiateViewController(withIdentifier: "ListingViewController") as? ListingViewController {
                 listingViewController.listingViewModel = viewModel
+                listingViewController.isFromTabBar = false
                 listingViewController.searchText = searchText
                 self.navigationController?.pushViewController(listingViewController, animated: true)
             }

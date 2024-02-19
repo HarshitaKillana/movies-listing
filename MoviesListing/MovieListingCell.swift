@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SDWebImage
 
 final class MovieListingCell: UITableViewCell {
         
@@ -27,12 +28,12 @@ final class MovieListingCell: UITableViewCell {
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
     }
-    
+        
     private func setUpView() {
-        mainview.layer.borderColor = UIColor.gray.withAlphaComponent(0.1).cgColor
+        mainview.layer.borderColor = UIColor.gray.withAlphaComponent(0.5).cgColor
         mainview.layer.borderWidth = 3
         mainview.layer.cornerRadius = 30
-        mainview.leftAnchor.constraint(equalTo: safeAreaLayoutGuide.leftAnchor, constant: 5)
+       // mainview.leftAnchor.constraint(equalTo: safeAreaLayoutGuide.leftAnchor, constant: 5)
     }
     
     func setupMovieImage(_ image:UIImage) {
@@ -75,7 +76,6 @@ final class MovieListingCell: UITableViewCell {
         movieTitle.text = movie.title
         movieYear.text = movie.year
         typeLabel.text = movie.type
-        /// need not hard code moview or series can get from model
         if movie.type == "movie" {
             typeImage.image = UIImage(named: "movie")
         } else {

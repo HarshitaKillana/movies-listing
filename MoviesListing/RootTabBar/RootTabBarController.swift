@@ -7,16 +7,23 @@
 
 import UIKit
 
-final class RootTabBarController: UITabBarController {
+
+
+final class RootTabBarController: UITabBarController, UITabBarControllerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        let homeViewController = HomeViewController()
-        let watchListViewController = ListingViewController()
-        
-        
-        
+        self.delegate = self
         
     }
+    
+    
+    func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
+        if let viewControllers = tabBarController.viewControllers {
+            if let listingVC = viewControllers.last as? ListingViewController {
+                listingVC.isFromTabBar = true
+            }
+        
+            }
+        }
 }

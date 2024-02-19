@@ -28,7 +28,7 @@ final class MovieDetailsController: UIViewController, UITableViewDelegate, UITab
                    await fetchMovieDetails()
                }
         tableView.allowsSelection = false
-       // setupErrorLabel()
+       
         
     }
     

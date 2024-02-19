@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21225" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22154" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_0" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21207"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22130"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -68,7 +69,7 @@
                     <constraint firstItem="qe0-Rj-5mN" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="40" id="XcA-eL-sty"/>
                     <constraint firstItem="VNS-ed-UWg" firstAttribute="centerX" secondItem="H2p-sc-9uM" secondAttribute="centerX" id="dwf-Cm-UH4"/>
                     <constraint firstItem="GzM-yY-OCe" firstAttribute="centerX" secondItem="H2p-sc-9uM" secondAttribute="centerX" id="gWO-44-ZdD"/>
-                    <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="VNS-ed-UWg" secondAttribute="bottom" constant="20" id="gi4-88-hvo"/>
+                    <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="VNS-ed-UWg" secondAttribute="bottom" constant="10" id="gi4-88-hvo"/>
                     <constraint firstItem="hzo-cv-uPT" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="40" id="hmV-Wq-OHe"/>
                     <constraint firstItem="ZUw-YH-SLM" firstAttribute="width" secondItem="H2p-sc-9uM" secondAttribute="width" multiplier="0.6" id="luh-Wz-KC2"/>
                     <constraint firstItem="GzM-yY-OCe" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="20" id="m8z-QS-xna"/>
